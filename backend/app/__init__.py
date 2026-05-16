@@ -9,7 +9,7 @@ import warnings
 # 需要在所有其他导入之前设置
 warnings.filterwarnings("ignore", message=".*resource_tracker.*")
 
-from flask import Flask, request
+from flask import Flask, request, abort, send_from_directory
 from flask_cors import CORS
 
 from .config import Config
@@ -73,6 +73,31 @@ def create_app(config_class=Config):
     def health():
         return {'status': 'ok', 'service': 'MiroFish Backend'}
     
+    # ==========================================
+    # Modo produção: servir frontend buildado
+    # ==========================================
+    frontend_dist = os.path.normpath(
+        os.path.join(os.path.dirname(__file__), '../../frontend/dist')
+    )
+    if os.path.isfile(os.path.join(frontend_dist, 'index.html')):
+        logger.info("Modo produção: servindo frontend buildado de %s", frontend_dist)
+
+        @app.route('/assets/<path:filename>')
+        def serve_assets(filename):
+            return send_from_directory(
+                os.path.join(frontend_dist, 'assets'), filename
+            )
+
+        @app.route('/')
+        @app.route('/<path:path>')
+        def serve_frontend(path=''):
+            if path.startswith(('api/', 'health', '_', 'static/')):
+                abort(404)
+            full_path = os.path.join(frontend_dist, path)
+            if os.path.isfile(full_path):
+                return send_from_directory(frontend_dist, path)
+            return send_from_directory(frontend_dist, 'index.html')
+
     if should_log_startup:
         logger.info("MiroFish Backend 启动完成")
     
