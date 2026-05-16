@@ -12,10 +12,12 @@ from app.config import Config
 
 errors = Config.validate()
 if errors:
-    print("配置错误:")
+    import logging
+    logging.basicConfig(level=logging.WARNING)
+    log = logging.getLogger('mirofish.wsgi')
+    log.warning("Configuração incompleta — a aplicação pode não funcionar corretamente:")
     for err in errors:
-        print(f"  - {err}")
-    print("\n请检查 .env 文件中的配置")
-    sys.exit(1)
+        log.warning("  - %s", err)
+    log.warning("Defina as variáveis de ambiente no EasyPanel e reinicie o container.")
 
 app = create_app()
