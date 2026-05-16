@@ -11,6 +11,7 @@ export default defineConfig({
       '@locales': path.resolve(__dirname, '../locales')
     }
   },
+  envDir: path.resolve(__dirname, '..'),
   server: {
     port: 3000,
     open: false,
