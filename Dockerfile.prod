@@ -49,4 +49,4 @@ EXPOSE 5001
 # --access-logfile -: log access to stdout
 # --error-logfile -: log errors to stdout
 # --timeout 120: 2min timeout for long-running requests
-CMD gunicorn --chdir /app/backend -w 2 -b 0.0.0.0:5001 --access-logfile - --error-logfile - --timeout 120 wsgi:app
+CMD uv run --directory /app/backend gunicorn -w 2 -b 0.0.0.0:5001 --access-logfile - --error-logfile - --timeout 120 wsgi:app
